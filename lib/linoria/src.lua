@@ -316,7 +316,9 @@ end;
 
 function Library:UpdateDependencyBoxes()
     for _, Depbox in next, Library.DependencyBoxes do
-        Depbox:Update();
+        if Depbox and Depbox.Update then
+            Depbox:Update();
+        end;
     end;
 end;
 
