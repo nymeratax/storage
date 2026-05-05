@@ -27,7 +27,8 @@
         Notifications = {Notifs = {}},
         OpenElement = {}; -- type: table or userdata
         EasingStyle = Enum.EasingStyle.Quint;
-        TweeningSpeed = 0.25
+        TweeningSpeed = 0.25;
+        ConfigHolder;
     }
     
     local themes = {
@@ -366,9 +367,8 @@
             return Color3.new(r, g, b), a
         end
 
-        local ConfigHolder;
         function Library:UpdateConfigList() 
-            if not ConfigHolder then 
+            if not Library.ConfigHolder then 
                 print("no exist :(")
                 return 
             end
@@ -381,7 +381,7 @@
                 List[#List + 1] = name
             end
 
-            ConfigHolder.RefreshOptions(List)
+            Library.ConfigHolder.RefreshOptions(List)
         end
 
         function Library:Keypicker(properties) 
