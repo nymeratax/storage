@@ -4973,16 +4973,31 @@
             Items.Outline.Position = dim_offset(20, offset)
 
             Library:Tween(Items.Outline, {AnchorPoint = vec2(0, 0)})
-            Library:Tween(Items.AccentLine, {Size = dim2(0, -2, 0, 1)}, TweenInfo.new(Cfg.Lifetime, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut, 0, false, 0))
+            Items.AccentLine.Size = dim2(1, -2, 0, 1)
+            Library:Tween(
+                Items.AccentLine,
+                {Size = dim2(0, -2, 0, 1)},
+                TweenInfo.new(Cfg.Lifetime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+            )
 
             task.spawn(function()
-                task.wait(Cfg.Lifetime)
+                local lifetime = Cfg.Lifetime
                 local fadeDuration = 1
+
+                task.wait(lifetime)
+
                 Notifications:FadeNotifs(Items.Outline, true)
-                Library:Tween(Items.Outline, {AnchorPoint = vec2(1, 0)}, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut))
+
+                Library:Tween(
+                    Items.Outline,
+                    {AnchorPoint = vec2(1, 0)},
+                    TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+                )
+
                 task.wait(fadeDuration)
-                Items.Outline:Destroy()
+
                 Notifications.Notifs[index] = nil
+                Items.Outline:Destroy()
             end)
         end
     --
