@@ -4153,33 +4153,16 @@
             return setmetatable(Cfg, Library)
         end
         
-        function Library:Colorpicker(properties) 
-            local Cfg = {
-                Name = properties.Name or "Color", 
-                Flag = properties.Flag or properties.Name or "Colorpicker",
-                Callback = properties.Callback or function() end,
+        function Library:Colorpicker(properties) -- i77 the fuck were u high on making ts
+            local Picker = self:Keypicker(properties)
 
-                Color = properties.Color or color(1, 1, 1), -- Default to white color if not provided
-                Alpha = properties.Alpha or properties.Transparency or 0,
-                
-                -- Other
-                Open = false;
-                Mode = properties.Mode or "Animation";
-                Items = {};
-            }
+            Picker.Mode = properties.Mode or "Animation"
 
-            local Picker = self:Keypicker(Cfg)
+            Picker.Set(Picker.Color, Picker.Alpha)
+            ConfigFlags[Picker.Flag] = Picker.Set
 
-            local Items = Picker.Items; do
-                Cfg.Items = Items
-                Cfg.Set = Picker.Set
-            end;
-            
-            Cfg.Set(Cfg.Color, Cfg.Alpha)
-            ConfigFlags[Cfg.Flag] = Cfg.Set
-
-            return setmetatable(Cfg, Library)
-        end 
+            return Picker
+        end
 
         function Library:Textbox(properties) 
             local Cfg = {
