@@ -1237,50 +1237,42 @@
         end 
 
         function Library:GetConfig()
-    local Config = {}
-    for Idx, Value in pairs(Flags) do
-        if type(Value) == "table" and Value.key ~= nil then 
-            Config[Idx] = {
-                active = Value.active, 
-                mode = Value.mode, 
-                key = (type(Value.key) == "userdata" and Value.key.Name) or tostring(Value.key)
-            }
-        elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
-            Config[Idx] = {
-                Transparency = Value["Transparency"], 
-                Color = Value["Color"]:ToHex()
-            }
-        else
-            Config[Idx] = Value
-        end
-    end
-    return HttpService:JSONEncode(Config)
-end
-
-function Library:LoadConfig(JSON)
-    local Config = HttpService:JSONDecode(JSON)
-    for Idx, Value in pairs(Config) do
-        if Idx == "config_name_list" then continue end
-        local Function = ConfigFlags[Idx]
-        
-        if Function then
-            if type(Value) == "table" and Value.key then
-                local Success, KeyCode = pcall(function() 
-                    return Enum.KeyCode[Value.key] or Enum.UserInputType[Value.key] 
-                end)
-                
-                if Success and KeyCode then
-                    Value.key = KeyCode
-                    Function(Value)
+            local Config = {}
+            
+            for Idx, Value in Flags do
+                if type(Value) == "table" and Value.key then
+                    Config[Idx] = {active = Value.active, mode = Value.mode, key = tostring(Value.key)}
+                elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
+                    Config[Idx] = {Transparency = Value["Transparency"], Color = Value["Color"]:ToHex()}
+                else
+                    Config[Idx] = Value
                 end
-            elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
-                Function(Color3.fromHex(Value["Color"]), Value["Transparency"])
-            else
-                Function(Value)
-            end
+            end 
+
+            return HttpService:JSONEncode(Config)
         end
-    end
-end
+
+        function Library:LoadConfig(JSON) 
+            local Config = HttpService:JSONDecode(JSON)
+            
+            for Idx, Value in Config do                
+                if Idx == "config_name_list" then 
+                    continue 
+                end
+
+                local Function = ConfigFlags[Idx]
+
+                if Function then 
+                    if type(Value) == "table" and Value["Transparency"] and Value["Color"] then
+                        Function(hex(Value["Color"]), Value["Transparency"])
+                    elseif type(Value) == "table" and Value["active"] then 
+                        Function(Value)
+                    else
+                        Function(Value)
+                    end
+                end 
+            end 
+        end 
         
         function Library:Round(num, float) 
             local Multiplier = 1 / (float or 1)
