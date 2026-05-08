@@ -1243,7 +1243,7 @@
                     Config[Idx] = {
                         active = Value.active, 
                         mode = Value.mode, 
-                        key = tostring(Value.key)
+                        key = Value.key.Name 
                     }
                 elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
                     Config[Idx] = {
@@ -1264,18 +1264,17 @@
                 local Function = ConfigFlags[Idx]
                 
                 if Function then
-                    if type(Value) == "table" and Value["Transparency"] and Value["Color"] then
-                        Function(hex(Value["Color"]), Value["Transparency"])
-                    elseif type(Value) == "table" and Value["key"] then
-                        if Value.key ~= "None" and Value.key ~= "nil" then
-                            local KeyName = Value.key:gsub("Enum.KeyCode.", "")
-                            pcall(function()
-                                Value.key = Enum.KeyCode[KeyName]
-                            end)
-                        else
-                            Value.key = nil
+                    if type(Value) == "table" and Value.key then
+                        local Success, KeyCode = pcall(function() 
+                            return Enum.KeyCode[Value.key] 
+                        end)
+                        
+                        if Success then
+                            Value.key = KeyCode
+                            Function(Value)
                         end
-                        Function(Value) 
+                    elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
+                        Function(hex(Value["Color"]), Value["Transparency"])
                     else
                         Function(Value)
                     end
