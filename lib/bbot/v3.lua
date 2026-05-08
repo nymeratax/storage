@@ -1237,54 +1237,47 @@
         end 
 
         function Library:GetConfig()
-    local Config = {}
-    for Idx, Value in Flags do
-        if type(Value) == "table" and Value.key ~= nil then 
-            Config[Idx] = {
-                active = Value.active, 
-                mode = Value.mode, 
-                key = (type(Value.key) == "EnumItem" and Value.key.Name) or tostring(Value.key)
-            }
-        elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
-            Config[Idx] = {
-                Transparency = Value["Transparency"], 
-                Color = Value["Color"]:ToHex()
-            }
-        else
-            Config[Idx] = Value
-        end
-    end
-    return HttpService:JSONEncode(Config)
-end
-
-function Library:LoadConfig(JSON)
-    local Config = HttpService:JSONDecode(JSON)
-    for Idx, Value in Config do
-        if Idx == "config_name_list" then continue end
-        local Function = ConfigFlags[Idx]
-        
-        if Function then
-            if type(Value) == "table" and Value.key then
-                local KeyCode
-                if Value.key == "NONE" or Value.key == "None" or Value.key == "nil" then
-                    KeyCode = nil
+            local Config = {}
+            for Idx, Value in Flags do
+                if type(Value) == "table" and Value.key ~= nil then 
+                    Config[Idx] = {
+                        active = Value.active, 
+                        mode = Value.mode, 
+                        key = Value.key.Name 
+                    }
+                elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
+                    Config[Idx] = {
+                        Transparency = Value["Transparency"], 
+                        Color = Value["Color"]:ToHex()
+                    }
                 else
-                    pcall(function()
-                        local CleanName = tostring(Value.key):gsub("Enum.KeyCode.", "")
-                        KeyCode = Enum.KeyCode[CleanName]
-                    end)
+                    Config[Idx] = Value
                 end
+            end
+            return HttpService:JSONEncode(Config)
+        end
+
+        function Library:LoadConfig(JSON)
+            local Config = HttpService:JSONDecode(JSON)
+            for Idx, Value in Config do
+                if Idx == "config_name_list" then continue end
+                local Function = ConfigFlags[Idx]
                 
-                Value.key = KeyCode
-                Function(Value)
-            elseif type(Value) == "table" and Value.Color then
-                Function(hex(Value.Color), Value.Transparency)
-            else
-                Function(Value)
+                if Function then
+                    if type(Value) == "table" and Value.key then
+                        local Success, KeyCode = pcall(function() return Enum.KeyCode[Value.key] end)
+                        if Success then
+                            Value.key = KeyCode
+                            Function(Value) -- This calls Cfg.Set(Value)
+                        end
+                    elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
+                        Function(hex(Value["Color"]), Value["Transparency"])
+                    else
+                        Function(Value)
+                    end
+                end
             end
         end
-    end
-end
         
         function Library:Round(num, float) 
             local Multiplier = 1 / (float or 1)
