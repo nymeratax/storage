@@ -1238,41 +1238,44 @@
 
         function Library:GetConfig()
             local Config = {}
-            
             for Idx, Value in Flags do
-                if type(Value) == "table" and Value.key then
-                    Config[Idx] = {active = Value.Active, mode = Value.Mode, key = tostring(Value.Key)}
+                if type(Value) == "table" and Value.key then 
+                    Config[Idx] = {
+                        active = Value.active, 
+                        mode = Value.mode, 
+                        key = tostring(Value.key)
+                    }
                 elseif type(Value) == "table" and Value["Transparency"] and Value["Color"] then
-                    Config[Idx] = {Transparency = Value["Transparency"], Color = Value["Color"]:ToHex()}
+                    Config[Idx] = {
+                        Transparency = Value["Transparency"], 
+                        Color = Value["Color"]:ToHex()
+                    }
                 else
                     Config[Idx] = Value
                 end
-            end 
-
+            end
             return HttpService:JSONEncode(Config)
         end
 
-        function Library:LoadConfig(JSON) 
+        function Library:LoadConfig(JSON)
             local Config = HttpService:JSONDecode(JSON)
-            
-            for Idx, Value in Config do                
-                if Idx == "config_name_list" then 
-                    continue 
-                end
-
+            for Idx, Value in Config do
+                if Idx == "config_name_list" then continue end
                 local Function = ConfigFlags[Idx]
-
-                if Function then 
+                
+                if Function then
                     if type(Value) == "table" and Value["Transparency"] and Value["Color"] then
                         Function(hex(Value["Color"]), Value["Transparency"])
-                    elseif type(Value) == "table" and Value["Active"] then 
+                    elseif type(Value) == "table" and Value["key"] and Value["mode"] then
+                        Function(Value) 
+                    elseif type(Value) == "table" and Value["Active"] then
                         Function(Value)
                     else
                         Function(Value)
                     end
-                end 
-            end 
-        end 
+                end
+            end
+        end
         
         function Library:Round(num, float) 
             local Multiplier = 1 / (float or 1)
